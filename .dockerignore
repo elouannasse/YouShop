@@ -1,0 +1,61 @@
+# Dependencies
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build output - dist/ is INCLUDED for pre-built strategy
+# dist  <-- COMMENTED OUT, we need dist/
+build
+*.tsbuildinfo
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Git
+.git
+.gitignore
+.github
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Documentation
+docs
+*.md
+!README.md
+
+# Testing
+coverage
+.nyc_output
+*.test.ts
+*.spec.ts
+test
+
+# Logs
+logs
+*.log
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Scripts
+*.ps1
+*.sh
+
+# Misc
+.editorconfig
+.eslintrc.js
+.prettierrc
+tsconfig.json
+nest-cli.json
