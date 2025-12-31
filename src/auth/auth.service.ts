@@ -52,7 +52,7 @@ export class AuthService {
           password: hashedPassword,
           firstName: registerDto.firstName,
           lastName: registerDto.lastName,
-          role: 'CLIENT', // Rôle par défaut
+          role: registerDto.role || 'CLIENT', // Rôle fourni ou CLIENT par défaut
         },
       });
 
