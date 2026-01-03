@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  UseInterceptors,
   ParseUUIDPipe,
   HttpStatus,
 } from '@nestjs/common';
@@ -24,6 +25,7 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
 import { Roles } from '../../auth/decorators/roles.decorator';
 import { Role } from '@prisma/client';
+import { CacheInterceptor } from '../../common/interceptors/cache.interceptor';
 
 /**
  * Contrôleur pour la gestion des catégories
@@ -72,6 +74,7 @@ export class CategoryController {
    * Obtenir toutes les catégories (PUBLIC)
    */
   @Get()
+  @UseInterceptors(CacheInterceptor)
   @ApiOperation({ summary: 'Obtenir la liste de toutes les catégories' })
   @ApiResponse({
     status: HttpStatus.OK,

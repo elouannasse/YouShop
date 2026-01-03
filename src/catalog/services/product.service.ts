@@ -35,6 +35,7 @@ export class ProductService {
     }
 
     // Créer le produit
+    const stockValue = createProductDto.stock ?? 0;
     const product = await this.prisma.product.create({
       data: {
         name: createProductDto.name,
@@ -42,7 +43,9 @@ export class ProductService {
         price: new Decimal(createProductDto.price),
         imageUrl: createProductDto.imageUrl,
         categoryId: createProductDto.categoryId,
-        stock: createProductDto.stock ?? 0,
+        stock: stockValue,
+        stockAvailable: stockValue, // 🔥 Important: stock disponible = stock initial
+        stockReserved: 0, // Aucune réservation au départ
       },
       include: {
         category: true,

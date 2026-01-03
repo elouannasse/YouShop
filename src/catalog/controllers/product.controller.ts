@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
   UseGuards,
+  UseInterceptors,
   ParseUUIDPipe,
   HttpStatus,
 } from '@nestjs/common';
@@ -27,6 +28,7 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
 import { Roles } from '../../auth/decorators/roles.decorator';
 import { Role } from '@prisma/client';
+import { CacheInterceptor } from '../../common/interceptors/cache.interceptor';
 
 /**
  * Contrôleur pour la gestion des produits
@@ -75,6 +77,7 @@ export class ProductController {
    * Obtenir tous les produits avec filtres et pagination (PUBLIC)
    */
   @Get()
+  @UseInterceptors(CacheInterceptor)
   @ApiOperation({
     summary: 'Obtenir la liste des produits avec filtres et pagination',
   })

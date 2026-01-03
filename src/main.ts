@@ -3,12 +3,20 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
+import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // CORS
   app.enableCors();
+
+  // Global Interceptors
+  app.useGlobalInterceptors(new LoggingInterceptor());
+
+  // Global Filters
+  app.useGlobalFilters(new HttpExceptionFilter());
 
   // Validation globale
   app.useGlobalPipes(

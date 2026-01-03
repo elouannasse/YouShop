@@ -22,6 +22,9 @@ model User {
   role      Role     @default(CLIENT)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  
+  // Relations
+  orders    Order[]
 
   @@map("users")
 }
@@ -45,14 +48,89 @@ model Product {
   imageUrl    String?
   categoryId  String
   category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  stock       Int      @default(0)
+  
+  // Stock management (ancien champ conservé pour compatibilité)
+  stock          Int      @default(0)
+  
+  // Nouveau: Gestion avancée des stocks
+  stockAvailable Int      @default(0) @map("stock_available")  // Stock disponible à la vente
+  stockReserved  Int      @default(0) @map("stock_reserved")   // Stock réservé (commandes en cours)
+  sku            String?  @unique                                // Stock Keeping Unit (identifiant unique) - optionnel pour migration
+  
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  
+  // Relations
+  orderItems  OrderItem[]
 
   @@index([categoryId])
   @@index([isActive])
+  @@index([sku])
   @@map("products")
+}
+
+enum OrderStatus {
+  PENDING    // En attente de paiement
+  PAID       // Payée
+  CANCELLED  // Annulée
+  EXPIRED    // Expirée (après timeout)
+}
+
+model Order {
+  id            String      @id @default(uuid())
+  orderNumber   String      @unique @map("order_number")  // Numéro de commande lisible (ex: ORD-2025-0001)
+  status        OrderStatus @default(PENDING)
+  
+  // Client
+  userId        String      @map("user_id")
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Prix
+  subtotal      Decimal     @db.Decimal(10, 2)  // Sous-total (sans taxes)
+  taxRate       Decimal     @db.Decimal(5, 2) @map("tax_rate")   // Taux de taxe (ex: 20.00 pour 20%)
+  taxAmount     Decimal     @db.Decimal(10, 2) @map("tax_amount")  // Montant de la taxe
+  totalAmount   Decimal     @db.Decimal(10, 2) @map("total_amount")  // Total TTC
+  
+  // Dates
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+  paidAt        DateTime?   @map("paid_at")  // Date du paiement
+  cancelledAt   DateTime?   @map("cancelled_at")  // Date d'annulation
+  expiresAt     DateTime?   @map("expires_at")  // Date d'expiration (ex: 30 min après création)
+  
+  // Items de la commande
+  orderItems    OrderItem[]
+  
+  @@index([status])
+  @@index([userId])
+  @@index([createdAt])
+  @@index([orderNumber])
+  @@map("orders")
+}
+
+model OrderItem {
+  id          String   @id @default(uuid())
+  
+  // Commande parente
+  orderId     String   @map("order_id")
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  // Produit
+  productId   String   @map("product_id")
+  product     Product  @relation(fields: [productId], references: [id])
+  
+  // Détails au moment de la commande (snapshot)
+  productName String   @map("product_name")  // Nom du produit au moment de l'achat
+  unitPrice   Decimal  @db.Decimal(10, 2) @map("unit_price")  // Prix unitaire au moment de l'achat
+  quantity    Int      // Quantité commandée
+  subtotal    Decimal  @db.Decimal(10, 2)  // Prix total pour cet item (unitPrice * quantity)
+  
+  createdAt   DateTime @default(now()) @map("created_at")
+  
+  @@index([orderId])
+  @@index([productId])
+  @@map("order_items")
 }
 
 enum Role {

@@ -5,6 +5,7 @@ import { ProductController } from './controllers/product.controller';
 import { CategoryController } from './controllers/category.controller';
 import { PrismaModule } from '../prisma/prisma.module';
 import { AuthModule } from '../auth/auth.module';
+import { CacheService } from '../common/interceptors/cache.interceptor';
 
 /**
  * Module Catalog - Gestion du catalogue de produits et catégories
@@ -29,7 +30,7 @@ import { AuthModule } from '../auth/auth.module';
     AuthModule, // Import AuthModule pour accès aux guards JWT et Roles
   ],
   controllers: [ProductController, CategoryController],
-  providers: [ProductService, CategoryService],
-  exports: [ProductService, CategoryService], // Exporté pour utilisation future dans Orders, Cart, etc.
+  providers: [ProductService, CategoryService, CacheService],
+  exports: [ProductService, CategoryService, CacheService], // Exporté pour utilisation future dans Orders, Cart, etc.
 })
 export class CatalogModule {}
